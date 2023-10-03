@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +19,9 @@ import * as z from "zod";
 import { userValidation } from "@/lib/validations/user";
 import { Button } from "../ui/button";
 import { isBase64Image } from '@/lib/utils'
-import { useUploadThing } from '@/lib/utils/upload'
+import { useUploadThing } from '@/lib/uploadthing';
+import { usePathname, useRouter } from "next/navigation";
+import { updateUser } from "@/lib/actions/user.actions";
 //define props
 interface Props {
   user: {
@@ -34,10 +36,12 @@ interface Props {
 }
 
 const AccountProfile = ({ user, btnTitle }: Props) => {
-  const [files, setFiles] = useState<File>([]);
+  const [files, setFiles] = useState<File[]>([]);
   const { startUpload } = useUploadThing("media")
+  const router = useRouter()
+  const pathname = usePathname()
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof userValidation>>({
     resolver: zodResolver(userValidation),
     defaultValues: {
       profile_photo: user?.image ? user.image : "",
@@ -56,12 +60,12 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
 
     const fileReader = new FileReader();
 
-    if (e.target.files && e.target.files.length > 0) {
+    if(e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
 
       setFiles(Array.from(e.target.files));
 
-      if (!file.type.inlcudes("image")) return;
+      if (!file.type.includes("image")) return;
 
       fileReader.onload = async (event) => {
         const imageDataUrl = event.target?.result?.toString() || "";
@@ -74,16 +78,16 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   };
 
   //value type is userValidation object values
-  function onSubmit(values: z.infer<typeof userValidation>) {
+  const onSubmit = async (values: z.infer<typeof userValidation>) => {
     const blob = values.profile_photo
 
     const hasImageChanged = isBase64Image(blob);
 
     if(hasImageChanged) {
-        const imgRes = await startupLoad(files)
+        const imgRes = await startUpload(files)
 
         if(imgRes && imgRes[0].fileUrl) { 
-            values.profile_image = imgRes[0].fileUrl
+            values.profile_photo = imgRes[0].fileUrl
         }
     }
 
@@ -92,6 +96,19 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     console.log(values);
 
     //TODO: Update User profile
+    await updateUser({
+     userId: user.id,
+      username: values.username,
+      name: values.name,
+      bio: values.bio,
+      image: values.profile_photo,
+      path: pathname,
+  })
+  if(pathname === "/profile/edit") {
+    router.back();
+  } else {
+    router.push('/')
+  }
     
   }
 
@@ -133,7 +150,6 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                   placeholder="Upload a photo"
                   className="account-form_image-input"
                   onChange={(e) => handleImage(e, field.onChange)}
-                  {...field}
                 />
               </FormControl>
             </FormItem>
@@ -187,7 +203,6 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
               <FormControl>
                 <Textarea
                   rows={10}
-                  type="text"
                   className="account-form_input no-focus"
                   {...field}
                 />

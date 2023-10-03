@@ -1,5 +1,5 @@
 import { authMiddleware } from "@clerk/nextjs";
-import { withApiAuthRequired, getSession } from '@clerk/nextjs';
+
  
 // This example protects all routes including api/trpc routes
 // Please edit this to allow other routes to be public as needed.
@@ -16,15 +16,3 @@ export const config = {
 };
  
 
-export const clerkAuthMiddleware = withApiAuthRequired(async (req, res) => {
-    const session = await getSession({ req });
-  
-    // Optionally, you can check user roles or perform other authorization checks here.
-  
-    // You can also attach the user session to the request for use in your route handler.
-    req.clerkSession = session;
-  
-    return {
-      props: {},
-    };
-  });

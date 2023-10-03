@@ -7,6 +7,8 @@ import { redirect } from "next/navigation";
 
 // export const getServerSideProps = clerkAuthMiddleware;
 
+
+
 const Page = async () => {
   const user = await currentUser();
   if (!user) return null;

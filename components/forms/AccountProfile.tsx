@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import * as z from "zod";
 
-import { userValidation } from "@/lib/validations/user";
+import { UserValidation } from "@/lib/validations/user";
 import { Button } from "../ui/button";
 import { isBase64Image } from '@/lib/utils'
 import { useUploadThing } from '@/lib/uploadthing';
@@ -41,8 +41,8 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   const router = useRouter()
   const pathname = usePathname()
 
-  const form = useForm<z.infer<typeof userValidation>>({
-    resolver: zodResolver(userValidation),
+  const form = useForm<z.infer<typeof UserValidation>>({
+    resolver: zodResolver(UserValidation),
     defaultValues: {
       profile_photo: user?.image ? user.image : "",
       name: user?.name ? user.name : "",
@@ -78,7 +78,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   };
 
   //value type is userValidation object values
-  const onSubmit = async (values: z.infer<typeof userValidation>) => {
+  const onSubmit = async (values: z.infer<typeof UserValidation>) => {
     const blob = values.profile_photo
 
     const hasImageChanged = isBase64Image(blob);
@@ -152,6 +152,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                   onChange={(e) => handleImage(e, field.onChange)}
                 />
               </FormControl>
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -170,6 +171,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                   {...field}
                 />
               </FormControl>
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -188,6 +190,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                   {...field}
                 />
               </FormControl>
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -207,6 +210,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                   {...field}
                 />
               </FormControl>
+              <FormMessage/>
             </FormItem>
           )}
         />

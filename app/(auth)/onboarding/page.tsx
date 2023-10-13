@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import AccountProfile from "@/components/forms/AccountProfile";
 //import currentuser from clerk
 import { currentUser } from "@clerk/nextjs";
@@ -7,15 +7,23 @@ import { redirect } from "next/navigation";
 
 // export const getServerSideProps = clerkAuthMiddleware;
 
-
+export class userData {
+  id: any;
+  objectId: any;
+  username!: string;
+  name!: string;
+  bio!: string;
+  image!: string;
+}
 
 const Page = async () => {
   const user = await currentUser();
   if (!user) return null;
 
-  const userInfo = {};
+  // const user: any = [12, 323, 45, 45, 34, 34, 34, 3];
+  const userInfo: any = {};
   //User object data from database
-  const userData = {
+  const userData: userData = {
     id: user.id,
     objectId: userInfo?._id || "",
     username: userInfo ? userInfo?.username : user.username,
@@ -31,7 +39,11 @@ const Page = async () => {
         Complete your profile now to use babble
       </p>
       <section className="mt-8 bg-white p-10">
-        <AccountProfile user={userData} btnTitle="Continue" />
+        <AccountProfile
+          // user={userData}
+          user={userData}
+          btnTitle="Continue"
+        />
       </section>
     </main>
   );
